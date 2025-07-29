@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskPlanner Pro - Organizador de Tareas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-tasks"></i>
+                    <h1>TaskPlanner Pro</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-icon" id="searchBtn" title="Buscar tareas">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="btn-icon" id="settingsBtn" title="Configuración">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="btn-icon" id="userBtn" title="Usuario">
+                        <i class="fas fa-user"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <button class="btn-primary" id="newTaskBtn">
+                        <i class="fas fa-plus"></i>
+                        Nueva Tarea
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Vistas</h3>
+                    <nav class="sidebar-nav">
+                        <a href="#" class="nav-item active" data-view="today">
+                            <i class="fas fa-calendar-day"></i>
+                            Hoy
+                            <span class="count" id="todayCount">0</span>
+                        </a>
+                        <a href="#" class="nav-item" data-view="upcoming">
+                            <i class="fas fa-calendar-week"></i>
+                            Próximas
+                            <span class="count" id="upcomingCount">0</span>
+                        </a>
+                        <a href="#" class="nav-item" data-view="all">
+                            <i class="fas fa-list"></i>
+                            Todas
+                            <span class="count" id="allCount">0</span>
+                        </a>
+                        <a href="#" class="nav-item" data-view="completed">
+                            <i class="fas fa-check-circle"></i>
+                            Completadas
+                            <span class="count" id="completedCount">0</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <h3>Proyectos</h3>
+                        <button class="btn-icon-small" id="newProjectBtn" title="Nuevo proyecto">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="projects-list" id="projectsList">
+                        <!-- Projects will be dynamically added here -->
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <h3>Etiquetas</h3>
+                        <button class="btn-icon-small" id="newTagBtn" title="Nueva etiqueta">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="tags-list" id="tagsList">
+                        <!-- Tags will be dynamically added here -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Task Area -->
+            <main class="task-area">
+                <div class="task-header">
+                    <h2 id="viewTitle">Hoy</h2>
+                    <div class="task-actions">
+                        <div class="view-options">
+                            <button class="btn-icon" id="listViewBtn" title="Vista lista">
+                                <i class="fas fa-list"></i>
+                            </button>
+                            <button class="btn-icon" id="gridViewBtn" title="Vista cuadrícula">
+                                <i class="fas fa-th"></i>
+                            </button>
+                        </div>
+                        <div class="sort-options">
+                            <select id="sortSelect">
+                                <option value="dueDate">Fecha de vencimiento</option>
+                                <option value="priority">Prioridad</option>
+                                <option value="created">Fecha de creación</option>
+                                <option value="alphabetical">Alfabético</option>
+                            </select>
+                        </div>
+                        <div class="filter-options">
+                            <select id="priorityFilter">
+                                <option value="all">Todas las prioridades</option>
+                                <option value="high">Alta prioridad</option>
+                                <option value="medium">Media prioridad</option>
+                                <option value="low">Baja prioridad</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-bar" id="searchBar" style="display: none;">
+                    <input type="text" id="searchInput" placeholder="Buscar tareas...">
+                    <button class="btn-icon" id="closeSearchBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="tasks-container" id="tasksContainer">
+                    <!-- Tasks will be dynamically added here -->
+                </div>
+
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No hay tareas</h3>
+                    <p>¡Comienza creando tu primera tarea!</p>
+                    <button class="btn-primary" onclick="openTaskModal()">
+                        <i class="fas fa-plus"></i>
+                        Crear Tarea
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nueva Tarea</h3>
+                <button class="btn-icon" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskTitle">Título *</label>
+                        <input type="text" id="taskTitle" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskDescription">Descripción</label>
+                        <textarea id="taskDescription" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskProject">Proyecto</label>
+                            <select id="taskProject">
+                                <option value="">Sin proyecto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskPriority">Prioridad</label>
+                            <select id="taskPriority">
+                                <option value="low">Baja</option>
+                                <option value="medium" selected>Media</option>
+                                <option value="high">Alta</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskDueDate">Fecha de vencimiento</label>
+                            <input type="date" id="taskDueDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDueTime">Hora</label>
+                            <input type="time" id="taskDueTime">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskTags">Etiquetas</label>
+                        <input type="text" id="taskTags" placeholder="Separar con comas">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="taskRecurring">
+                            Tarea recurrente
+                        </label>
+                        <select id="recurringType" style="display: none;">
+                            <option value="daily">Diario</option>
+                            <option value="weekly">Semanal</option>
+                            <option value="monthly">Mensual</option>
+                        </select>
+                    </div>
+
+                    <div class="subtasks-section">
+                        <div class="section-header">
+                            <label>Subtareas</label>
+                            <button type="button" class="btn-icon-small" id="addSubtaskBtn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div id="subtasksList">
+                            <!-- Subtasks will be added here -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancelBtn">Cancelar</button>
+                <button type="submit" form="taskForm" class="btn-primary" id="saveTaskBtn">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Modal -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Nuevo Proyecto</h3>
+                <button class="btn-icon" id="closeProjectModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="projectForm">
+                    <div class="form-group">
+                        <label for="projectName">Nombre del proyecto *</label>
+                        <input type="text" id="projectName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectColor">Color</label>
+                        <input type="color" id="projectColor" value="#3b82f6">
+                    </div>
+                    <div class="form-group">
+                        <label for="projectDescription">Descripción</label>
+                        <textarea id="projectDescription" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancelProjectBtn">Cancelar</button>
+                <button type="submit" form="projectForm" class="btn-primary">Crear Proyecto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="notifications" id="notifications">
+        <!-- Notifications will be added here -->
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
